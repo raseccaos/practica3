@@ -2,73 +2,88 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <time.h>
 
 #define N_COCHES 8
 
-// Tipo de datos que representa un coche
 typedef struct {
     int id;
-    char *cadena;
+    char *nombre;
 } coche_t;
 
-// Array de datos de tipo coche_t
 coche_t Coches[N_COCHES];
 
+/* -------------------------------------------------
+   BLOQUE A COMPLETAR: CODIGO 0
+   Espacio para variables globales adicionales si fueran necesarias
+   ------------------------------------------------- */
 
-// Funcion ejecutada por los hilos
-void *funcion_coche(coche_t *pcoche)
+pthread_mutex_t mutex_output = PTHREAD_MUTEX_INITIALIZER;
+
+void *funcion_coche(void *arg)
 {
-    int aleatorio;
-    unsigned int semilla = (pcoche->id) + pthread_self(); // semilla generacion num. aleatorios
+    coche_t *pcoche = (coche_t *)arg;
 
-    printf("Salida de %s %d\n", pcoche->cadena, pcoche->id);
-    
-    fflush (stdout);
+    /* Inicializar semilla distinta para cada hilo */
+    unsigned int semilla = pcoche->id + (unsigned int)time(NULL);
+    int retardo = rand_r(&semilla) % 10 + 1;
 
-    // generar numero aleatorios con funcion re-entrante rand_r()    
-    aleatorio = rand_r(&semilla) % 10;
+    /* Mensaje de salida del coche */
+    pthread_mutex_lock(&mutex_output);
+    printf("Salida de %s %d\n", pcoche->nombre, pcoche->id);
+    fflush(stdout);
+    pthread_mutex_unlock(&mutex_output);
 
-    sleep(aleatorio);
- 
-    printf("Llegada de %s %d\n", pcoche->cadena, pcoche->id);
+    /* Simulacion de la carrera mediante retardo aleatorio */
+    sleep(retardo);
 
-    /* CODIGO 4 */
+    /* Mensaje de llegada del coche */
+    pthread_mutex_lock(&mutex_output);
+    printf("Llegada de %s %d\n", pcoche->nombre, pcoche->id);
+    pthread_mutex_unlock(&mutex_output);
 
+    /* -------------------------------------------------
+       BLOQUE A COMPLETAR: CODIGO 4
+       Espacio para registrar la posicion o clasificacion
+       ------------------------------------------------- */
 
-    /* CODIGO 2 */    
+    /* -------------------------------------------------
+       BLOQUE A COMPLETAR: CODIGO 6 (opcional)
+       Espacio para devolver informacion al hilo principal
+       ------------------------------------------------- */
+
+    return NULL;
 }
-
 
 int main(void)
 {
-    pthread_t hilosCoches[N_COCHES]; // tabla con los identificadores de los hilos
-    int i;
-    
+    pthread_t hilosCoches[N_COCHES];
+
     printf("Se inicia proceso de creacion de hilos...\n\n");
     printf("SALIDA DE COCHES\n");
-    
-    for (i=0; i<N_COCHES; i++)
-    {
-        
-        /* CODIGO 1 */
-        
-    }
+
+    /* -------------------------------------------------
+       BLOQUE A COMPLETAR: CODIGO 1
+       Espacio para inicializar estructuras y crear hilos
+       ------------------------------------------------- */
 
     printf("Proceso de creacion de hilos terminado\n\n");
-     
-    
-    for (i=0; i<N_COCHES; i++)
-    {
-        
-        /* CODIGO 3 */
-        
-    }
-   
-    printf("Todos los coches han LLEGADO A LA META \n");
-    
-    /* CODIGO 5 */        
+
+    /* -------------------------------------------------
+       BLOQUE A COMPLETAR: CODIGO 3
+       Espacio para esperar a la finalizacion de los hilos
+       ------------------------------------------------- */
+
+    printf("Todos los coches han LLEGADO A LA META\n");
+
+    /* -------------------------------------------------
+       BLOQUE A COMPLETAR: CODIGO 5
+       Espacio para mostrar la clasificacion final
+       ------------------------------------------------- */
+
+    /* Liberar recursos del mutex de salida */
+    pthread_mutex_destroy(&mutex_output);
 
     return 0;
 }
-
-
